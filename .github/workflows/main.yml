@@ -48,7 +48,7 @@ jobs:
         - name: Log in to Github Packages
           run: echo ${HEROKU_GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
           env: 
-            GITHUB_TOKEN: ${{ secrets.HEROKU_GITHUB_TOKEN }}
+            HEROKU_GITHUB_TOKEN: ${{ secrets.HEROKU_GITHUB_TOKEN }}
         - name: Pull image
           run: |
             docker pull ${{ env.IMAGE }}:latest || true
