@@ -1,33 +1,45 @@
-import os
-from flask import Flask, render_template, request, url_for, redirect
-
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
+
 @app.route("/")
-def salut():
-    return render_template("form.html")
+def form():
+    return render_template("lab11.html")
 
-
-@app.route("/diresalut", methods=['GET', 'POST'])
-def submit(): 
-
-    nom = request.form["nom"]
+@app.route("/submit", methods=["POST"])
+def submit():
     prenom = request.form["prenom"]
-    age= request.form["age"]
-    error = None
+    nom = request.form["nom"]
+    age = request.form["age"]
 
-    if not nom or not nom.strip():
-        error = "Il manque le nom"
-    if not prenom or not prenom.strip():
-        error = "Il manque le prenom"
-    if not age or not age.strip():
-        error = "Il manque l'age"
+    error = ""
 
-    if error:
-        return render_template("form.html", nom=nom, prenom=prenom, age=age, error=error)
+    if not prenom:
+        error += "Le prénom doit être non nul /"
+    if not nom:
+        error += "Le nom doit être non nul /"
+    if not age:
+        error += "L'âge doit être non nul /"
+
+    if error != "":
+        return render_template("lab11.html", error=error, nom=nom, prenom=prenom, age=age)
+
+    with open("db.txt", "a") as fichier:
+        fichier.write(f"{nom}, {prenom}, {age}\n")
+    return redirect(url_for("results"))
 
 
-    return redirect(url_for('foo'))
-    
+@app.route("/results")
+def results():
+    results = []
+    lines = open("db.txt", "r").readlines()
+    for line in lines:
+        result = line.split(",") # [nom, prenom, age]
+        results.append(result)
+        print(result)
+    print(results)
+    return render_template("results.html", results=results, len=len(results))
+
+
 if __name__ == "__main__":
     app.run(debug=True,host='0.0.0.0', port=8050)
